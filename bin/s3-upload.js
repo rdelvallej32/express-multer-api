@@ -7,12 +7,17 @@ const fs = require('fs');
 //if a path is not provided pass a string. Its for testing
 let filename = process.argv[2] || '';
 
+let title = process.argv[3] || 'No Title';
+
 ///file-type returns an object that returns ext and mime: npm module/node
 const fileType = require('file-type');
 
 //require the aws upload function
 const awsS3Upload = require('../lib/aws-s3-upload.js');
 
+//require mongoose from the middleware to use the mongoose library
+const mongoose = require('../app/middleware/mongoose');
+const Upload = require('../app/models/upload');
 ///creation of the mimetype which returns an object with ext and mime
 //always return object with extension and mime.
 //FileType returns null when no match
@@ -48,9 +53,17 @@ const readFile = (filename) =>
   })
   .then(awsS3Upload)
   ///
-  .then((s3response) => console.log(s3response))
+  .then((s3response) => {
+    let upload = {
+      location: s3response.Location,
+      title: title,
+    };
+    return Upload.create(upload);
+  })
+  .then(console.log)
   ///handles the error
-  .catch(console.error);
+  .catch(console.error)
+  .then(() => mongoose.connection.close());
 
 
 // //success will log the filename along with the data length bytes
