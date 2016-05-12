@@ -7,6 +7,7 @@
     "s3-upload": "node ./bin/s3-upload.js"
   },
   "dependencies": {
+    "aws-sdk": "^2.3.10",
     "bcrypt": "^0.8.5",
     "body-parser": "~1.13.2",
     "cors": "^2.7.1",
