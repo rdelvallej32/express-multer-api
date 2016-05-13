@@ -10,6 +10,8 @@ const multer = middleware['multer'];
 
 const awsS3Upload = require('lib/aws-s3-upload');
 
+const mime = require('mime-types');
+
 const index = (req, res, next) => {
   Upload.find()
     .then(uploads => res.json({ uploads }))
@@ -18,13 +20,23 @@ const index = (req, res, next) => {
 
 const create = (req, res, next) => {
   let upload = {
-    mime: req.file.mimetype,
     data: req.file.buffer,
+    ext: mime.extension(req.file.mimetype),
+    mime: req.file.mimetype,
   };
-  res.json({ upload });
-  // Upload.create(upload)
-  //   .then(upload => res.json({ upload }))
-  //   .catch(err => next(err));
+  ///here is where we begin to start using the blueprint of that script
+  awsS3Upload(upload)
+  .then((s3response) => {
+    let upload = {
+      location: s3response.Location,
+      title: req.body.upload.title,
+    };
+    return Upload.create(upload);
+  })
+  .then( (upload) => {
+    res.status(201).json({ upload });
+  })
+  .catch(err => next(err));
 };
 
 module.exports = controller({

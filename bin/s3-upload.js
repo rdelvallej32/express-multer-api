@@ -4,6 +4,9 @@ require('dotenv').config();
 
 const fs = require('fs');
 
+////THIS IS ALL A SCRIPT TO TEST HOW TO UPLOAD, SIMILAR TO WHAT I DID WITH TWILLIO
+/////NOW WE HAVE THE BLUEPRINT TO USE IN OUR EXPRESS CONTROLLER
+
 //if a path is not provided pass a string. Its for testing
 let filename = process.argv[2] || '';
 
