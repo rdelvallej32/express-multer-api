@@ -12,6 +12,14 @@ const awsS3Upload = require('lib/aws-s3-upload');
 
 const mime = require('mime-types');
 
+const path = require('path');
+
+const extension = (mimetype, filename) =>
+  mime.extension(mimetype) ||
+  (!/\/x-/.test(mimetype) && mimetype.replace('/', '/x-')) ||
+  path.extname(filename).replace(/^./, '');
+
+
 const index = (req, res, next) => {
   Upload.find()
     .then(uploads => res.json({ uploads }))
@@ -21,7 +29,7 @@ const index = (req, res, next) => {
 const create = (req, res, next) => {
   let upload = {
     data: req.file.buffer,
-    ext: mime.extension(req.file.mimetype),
+    ext: extension(req.file.mimetype, req.file.originalname),
     mime: req.file.mimetype,
   };
   ///here is where we begin to start using the blueprint of that script
